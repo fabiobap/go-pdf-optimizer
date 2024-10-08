@@ -44,21 +44,26 @@ func (m *Repository) PostPDFOptimizer(w http.ResponseWriter, r *http.Request) {
 	// Parse the form
 	err := r.ParseMultipartForm(10 << 20) // 10 MB
 	if err != nil {
-		http.Error(w, "Error parsing form", http.StatusBadRequest)
+		m.App.Session.Put(r.Context(), "error", "Internal error")
+		log.Printf("Error parsing form: %v", err)
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 
 	// Get the PDF file
 	file, header, err := r.FormFile("pdfFile")
 	if err != nil {
-		http.Error(w, "Error retrieving the file", http.StatusBadRequest)
+		m.App.Session.Put(r.Context(), "error", "Internal error")
+		log.Printf("Error retrieving file: %v", err)
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 	defer file.Close()
 
 	// Check if the file has a .pdf extension
 	if filepath.Ext(header.Filename) != ".pdf" {
-		http.Error(w, "File is not a PDF", http.StatusBadRequest)
+		m.App.Session.Put(r.Context(), "error", "Only PDF files are allowed")
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 
@@ -66,38 +71,45 @@ func (m *Repository) PostPDFOptimizer(w http.ResponseWriter, r *http.Request) {
 	var buf bytes.Buffer
 	_, err = io.Copy(&buf, file)
 	if err != nil {
-		http.Error(w, "Error reading the file", http.StatusInternalServerError)
+		m.App.Session.Put(r.Context(), "error", "Error reading the file")
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 
 	// Save the buffer to a temporary file
 	tempFile, err := os.CreateTemp("", "uploaded-*.pdf")
 	if err != nil {
-		http.Error(w, "Error creating temporary file", http.StatusInternalServerError)
+		m.App.Session.Put(r.Context(), "error", "Internal error")
+		log.Printf("Error creating temporary file: %v", err)
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 	defer os.Remove(tempFile.Name())
 
 	_, err = io.Copy(tempFile, &buf)
 	if err != nil {
-		http.Error(w, "Error saving the file", http.StatusInternalServerError)
+		m.App.Session.Put(r.Context(), "error", "Internal error")
+		log.Printf("Error saving the file: %v", err)
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 
-	outputFileName := "optimized.pdf"
+	outputFileName := "./temp-pdf/optimized.pdf"
 
 	// Optimize the PDF
 	err = api.OptimizeFile(tempFile.Name(), outputFileName, nil)
 	if err != nil {
-		http.Error(w, "Error optimizing PDF", http.StatusInternalServerError)
-		log.Printf("Error optimizing PDF: %v", err)
+		m.App.Session.Put(r.Context(), "error", "Error optimizing PDF")
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 
 	// Read the optimized PDF back into a buffer
 	optimizedFile, err := os.Open(outputFileName)
 	if err != nil {
-		http.Error(w, "Error opening optimized file", http.StatusInternalServerError)
+		m.App.Session.Put(r.Context(), "error", "Internal error")
+		log.Printf("Error opening optimized file: %v", err)
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 	defer optimizedFile.Close()
@@ -105,7 +117,9 @@ func (m *Repository) PostPDFOptimizer(w http.ResponseWriter, r *http.Request) {
 	var optimizedBuf bytes.Buffer
 	_, err = io.Copy(&optimizedBuf, optimizedFile)
 	if err != nil {
-		http.Error(w, "Error reading optimized file", http.StatusInternalServerError)
+		m.App.Session.Put(r.Context(), "error", "Internal error")
+		log.Printf("Error reading optimized file: %v", err)
+		http.Redirect(w, r, "/pdf-optimizer", http.StatusSeeOther)
 		return
 	}
 

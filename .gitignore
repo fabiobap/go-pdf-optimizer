@@ -1,3 +1,5 @@
 .idea
 pdf-optimizer.exe
 .env
+/temp-pdf/*
+!/temp-pdf/.gitkeep
