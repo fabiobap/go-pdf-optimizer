@@ -1,0 +1,80 @@
+{{template "admin" .}}
+{{define "css"}}
+{{end}}
+{{define "page-title"}}
+Pdf Optimize
+{{end}}
+
+{{define "content"}}
+<div class="container mt-5">
+    <h2 class="mb-4">Upload PDF File</h2>
+    <form id="uploadForm" action="/pdf-optimizer" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <div class="form-group">
+            <div id="dropzone" class="dropzone">
+                Drag & Drop your PDF file here or click to upload
+            </div>
+            <input type="file" id="fileInput" name="pdfFile" class="form-control-file" accept="application/pdf"
+                style="display: none;">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{{end}}
+{{define "js"}}
+<script>
+    $(document).ready(function () {
+        var dropzone = $('#dropzone');
+        var fileInput = $('#fileInput');
+
+        dropzone.on('click', function () {
+            fileInput.click();
+        });
+
+        fileInput.on('change', function () {
+            handleFiles(this.files);
+        });
+
+        dropzone.on('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.addClass('dragover');
+        });
+
+        dropzone.on('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.removeClass('dragover');
+        });
+
+        dropzone.on('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.removeClass('dragover');
+            var files = e.originalEvent.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                var file = files[0];
+                if (file.type === 'application/pdf') {
+                    dropzone.text('File ready to upload: ' + file.name);
+                } else {
+                    notify("Only PDF files are allowed.", "error")
+                }
+            }
+        }
+
+        $('#uploadForm').on('submit', function (e) {
+            e.preventDefault();
+            var files = fileInput[0].files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                this.submit();
+            } else {
+                notify("Please upload a PDF file.", "error")
+            }
+        });
+    });
+</script>
+{{end}}

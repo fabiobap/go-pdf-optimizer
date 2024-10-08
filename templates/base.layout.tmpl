@@ -31,6 +31,19 @@
         .notie-container {
             z-index: 50000
         }
+        
+        .dropzone {
+            border: 2px dashed #007bff;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            color: #007bff;
+            cursor: pointer;
+        }
+        
+        .dropzone.dragover {
+            background-color: #e9ecef;
+        }
     </style>
 
 
@@ -75,26 +88,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false"
-                            aria-controls="ui-basic">
-                            <i class="ti-palette menu-icon"></i>
-                            <span class="menu-title">Collapse example</span>
-                            <i class="menu-arrow"></i>
+                        <a class="nav-link" href="pdf-optimizer">
+                            <i class="ti-layout-list-post menu-icon"></i>
+                            <span class="menu-title">Optimize PDF</span>
                         </a>
-                        <div class="collapse" id="ui-basic">
-                            <ul class="nav flex-column sub-menu">
-                                <li class="nav-item"><a class="nav-link" href="#">Page 1</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Page 2</a></li>
-                            </ul>
-                        </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="pdf-split">
                             <i class="ti-layout-list-post menu-icon"></i>
-                            <span class="menu-title">Page 3</span>
+                            <span class="menu-title">Split PDF</span>
                         </a>
                     </li>
-
                 </ul>
             </nav>
             <!-- partial -->
@@ -133,9 +137,11 @@
         <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
         crossorigin="anonymous"></script>
+         <!-- jQuery UI for drag and drop -->
+    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- plugins:js -->
     <script src="/static/vendors/base/vendor.bundle.base.js"></script>
     <!-- endinject -->
@@ -152,7 +158,6 @@
     <script src="https://unpkg.com/notie"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.js"></script>
     <script src="/static/js/app.js"></script>
-
     <script src="/static/js/dashboard.js"></script>
     <!-- End custom js for this page-->
     <script>

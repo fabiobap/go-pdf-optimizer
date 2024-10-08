@@ -17,8 +17,13 @@ func routes(app *config.AppConfig) http.Handler {
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
+	mux.Handle("/temp-pdf/", http.StripPrefix("/temp-pdf/", http.FileServer(http.Dir("temp-pdf"))))
 
 	mux.Get("/", handlers.Repo.Home)
+	mux.Get("/pdf-optimizer", handlers.Repo.PDFOptimizer)
+	mux.Post("/pdf-optimizer", handlers.Repo.PostPDFOptimizer)
+	mux.Get("/pdf-split", handlers.Repo.PDFSplit)
+	mux.Post("/pdf-split", handlers.Repo.PostPDFSplit)
 
 	return mux
 }
